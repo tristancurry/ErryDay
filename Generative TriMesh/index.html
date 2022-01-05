@@ -1,11 +1,40 @@
 <html>
   <head>
-    <style>
+    <style type="text/css">
     </style>
   </head>
 
   <body>
-  <canvas></canvas>
-  <script></script>
+  <script type="text/javascript">
+    const MAX_HEIGHT = window.innerHeight/2;
+    const MAX_WIDTH = 2*window.innerWidth/3;
+    const DENSITY = 8;
+    const GAP = MAX_HEIGHT/DENSITY;
+    const STROKE_COLOR = '#0012DE';
+
+    let body = document.getElementsByTagName('body')[0];
+    let canvas0 = document.createElement('canvas');
+    canvas0.height = MAX_HEIGHT;
+    canvas0.width = MAX_WIDTH;
+    body.appendChild(canvas0);
+
+    let ctx0 = canvas0.getContext('2d');
+
+
+    //generate a distorted triangular mesh and colour it
+    //retain colouring and distortions, then mutate it
+
+    const lines = [];
+    let odd = false;
+    for (let y = GAP/2; y <= MAX_HEIGHT; Y += GAP) {
+      odd = !odd;
+      const trait = [];
+      const oddFactor = odd ? GAP/2 : 0;
+
+      //abandoning here temporarily!
+    }
+
+
+  </script>
   </body>
 </html>
