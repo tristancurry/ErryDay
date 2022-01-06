@@ -11,7 +11,7 @@
     const WINDOW_WIDTH = 200;
     const WINDOW_HEIGHT = 200;
 
-
+    let imageLoaded = false;
     let body = document.getElementsByTagName('body')[0];
 
     let canvas0 = document.createElement('canvas');
@@ -39,7 +39,6 @@
     make_base(ctx1);
 
 
-
     function make_base(ctx) {
       let baseImage = new Image();
       baseImage.src = 'GOPR0382.JPG';
@@ -47,11 +46,12 @@
         ctx.scale(0.25, 0.25);
         ctx.drawImage(baseImage, 0, 0);
         ctx.setTransform(1,0,0,1,0,0);
+        imageLoaded = true;
       }
     }
 
 
-  function p5_copy(src, sx, sy, sw, sh, dx, dy, dw, dh) {
+  function p5_copy(src, dest, sx, sy, sw, sh, dx, dy, dw, dh) {
     let imgData = src.getImageData(sx, sy, sw, sh);
     if( dw != sw || dh != sh) {
       let tempCanvas = document.createElement('canvas');
@@ -64,7 +64,7 @@
       imgData = tctx.getImageData(0,0,dw,dh);
       tempCanvas.remove();
     }
-    ctx0.putImageData(imgData, dx, dy);
+    dest.putImageData(imgData, dx, dy);
   }
 
   update();
@@ -74,9 +74,10 @@
     if (cY < 50 ) {cY = 50};
     if (cX > canvas0.width - 50) {cX = canvas0.width - 50};
     if (cY > canvas0.height - 50) {cY = canvas0.height - 50};
-    p5_copy(ctx1, cX - 50, cY - 50, 100, 100, MAX_WIDTH/2 - WINDOW_WIDTH/2, MAX_HEIGHT/2 - WINDOW_HEIGHT/2, WINDOW_WIDTH, WINDOW_HEIGHT);
+    if (imageLoaded) {
+      p5_copy(ctx1, ctx0, cX - 50, cY - 50, 100, 100, MAX_WIDTH/2 - WINDOW_WIDTH/2, MAX_HEIGHT/2 - WINDOW_HEIGHT/2, WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
     requestAnimationFrame(update);
-
   }
 
   </script>

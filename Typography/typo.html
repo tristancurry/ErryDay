@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <style type="text/css">
+    </style>
+  </head>
+
+  <body>
+  <script type="text/javascript">
+    const MAX_WIDTH = 800;
+    const MAX_HEIGHT = 600;
+    const WINDOW_WIDTH = 200;
+    const WINDOW_HEIGHT = 200;
+    const TILE_WIDTH = 50;
+    const TILE_HEIGHT = 10;
+    const TILES_X = Math.ceil(MAX_WIDTH/TILE_WIDTH);
+    const TILES_Y = Math.ceil(MAX_HEIGHT/TILE_HEIGHT);
+
+    let imageLoaded = false;
+    let body = document.getElementsByTagName('body')[0];
+
+    let canvas0 = document.createElement('canvas');
+    canvas0.height = MAX_HEIGHT;
+    canvas0.width = MAX_WIDTH;
+    canvas0.style.cursor = 'cell';
+    body.appendChild(canvas0);
+
+    let cX = 50;
+    let cY = 50;
+
+    canvas0.addEventListener('mousemove', e => {
+      let cRect = canvas0.getBoundingClientRect();
+      cX = Math.round(e.clientX - cRect.left);
+      cY = Math.round(e.clientY - cRect.top);
+    });
+
+    let canvas1 = document.createElement('canvas');
+    let canvasT = document.createElement('canvas');
+
+    canvas1.height = MAX_HEIGHT;
+    canvas1.width = MAX_WIDTH;
+
+    let ctx0 = canvas0.getContext('2d');
+    let ctx1 = canvas1.getContext('2d');
+    ctx0.fillRect(0,0,canvas0.width, canvas0.height);
+
+
+    function make_base(ctx) {
+      let baseImage = new Image();
+      baseImage.src = 'GOPR0382.JPG';
+      baseImage.onload = function() {
+        ctx.fillRect(-1*MAX_WIDTH, -1*MAX_HEIGHT, 2*MAX_WIDTH, 2*MAX_HEIGHT);
+        ctx.scale(0.25, 0.25);
+        ctx.drawImage(baseImage, 0, 0);
+        ctx.setTransform(1,0,0,1,0,0);
+        imageLoaded = true;
+        startTime = Date.now();
+      }
+    }
+
+
+  function p5_copy(src, dest, sx, sy, sw, sh, dx, dy, dw, dh, temp, tempctx) {
+    let imgData = src.getImageData(sx, sy, sw, sh);
+    // if( dw != sw || dh != sh) {
+      let tempCanvas = temp;
+      if(!temp) {
+        tempCanvas = document.createElement('canvas');
+      }
+      tempCanvas.width = dw;
+      tempCanvas.height = dh;
+      let tctx = tempctx;
+      if(!tempctx) {
+        tctx = tempCanvas.getContext('2d');
+      }
+      tctx.putImageData(imgData,0,0);
+      tctx.scale(dw/sw, dh/sh);
+      tctx.drawImage(tempCanvas,0,0);
+      imgData = tctx.getImageData(0,0,dw,dh);
+      if(!temp) {
+        tempCanvas.remove();
+      }
+    // }
+    dest.putImageData(imgData, dx, dy);
+  }
+
+  let startTime = Date.now();
+  make_base(ctx1);
+  ctx1.fillStyle = "rgb(0,0,0)";
+  ctx1.fillRect(0,0,MAX_WIDTH,MAX_HEIGHT);
+  ctx1.font = `${MAX_WIDTH/6}px Arial`;
+  ctx1.fillStyle = "rgb(255,255,255)";
+  ctx1.translate(0.30*MAX_WIDTH,5*MAX_HEIGHT/8);
+  ctx1.scale(1,2);
+  ctx1.fillText("Hello.", 0,0);
+  ctx1.scale(1,1);
+  ctx1.setTransform(1,0,0,1,0,0);
+  imageLoaded = true;
+  update();
+
+  function update () {
+    // ctx0.fillRect(0,0,MAX_WIDTH,MAX_HEIGHT);
+    if (cX < TILE_WIDTH ) {cX = TILE_WIDTH};
+    if (cY < TILE_HEIGHT ) {cY = TILE_HEIGHT};
+    if (cX > canvas0.width - TILE_WIDTH) {cX = canvas0.width - TILE_WIDTH};
+    if (cY > canvas0.height - TILE_HEIGHT) {cY = canvas0.height - TILE_HEIGHT};
+    if (imageLoaded) {
+      let dt = (Date.now() - startTime);
+      for (let x = 1; x < TILES_X - 1; x++) {
+        for (let y = 1; y < TILES_Y - 1; y++) {
+          // let waveAmp = TILE_WIDTH*0.1;
+          let wave = Math.sin(dt/250 + (x*y));
+          let dist = Math.sqrt(Math.pow(cX - x*TILE_WIDTH, 2) + Math.pow(cY - y*TILE_HEIGHT,2));
+          if(dist < 1) {dist = 1;}
+          //source
+          let src = ctx1;
+          let sx = (x*TILE_WIDTH + 10*TILE_WIDTH*wave/dist);
+          let sy = y*TILE_HEIGHT + 10*TILE_HEIGHT*Math.cos(dt/220 + (x*y))/dist;
+          let sw = TILE_WIDTH;
+          let sh = TILE_HEIGHT;
+
+          //destination
+          let dest = ctx0;
+          let dx = x*TILE_WIDTH;
+          let dy = y*TILE_HEIGHT;
+          let dw = TILE_WIDTH;
+          let dh = TILE_HEIGHT;
+
+          p5_copy(src, dest, sx, sy, sw, sh, dx, dy, dw, dh, canvasT);
+        }
+      }
+    }
+    requestAnimationFrame(update);
+  }
+
+  </script>
+  </body>
+</html>
